@@ -1,4 +1,4 @@
-(defproject com.vgeshel/cheshire "5.3.1"
+(defproject com.vgeshel/cheshire "5.3.1.1"
   :description "JSON and JSON SMILE encoding, fast."
   :url "https://github.com/dakrone/cheshire"
   :license {:name "The MIT License"
@@ -9,7 +9,8 @@
                  [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.3.1"]
                  [tigris "0.1.1"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.5.1"]
-                                  [org.clojure/test.generative "0.1.4"]]}
+                                  [org.clojure/test.generative "0.1.4"]
+                                  [criterium "0.4.2"]]}
              :1.2 {:dependencies [[org.clojure/clojure "1.2.1"]]}
              :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}
              :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}

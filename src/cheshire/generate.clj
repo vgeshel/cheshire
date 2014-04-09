@@ -108,10 +108,26 @@
   ;;(println :inst? k obj)
   `(instance? ~k ~obj))
 
+(defn- jsonable?
+  "this is not quite accurate but much faster that straight satisfies?.
+the behavior is: JSONable is supported on clojure defrecords and deftypes that implement the JSONable protocol either in a declaration or via extend"
+  [o fast?]
+  (if fast?
+    ;; the fast branch handles the case of defrecords - this has to be checked before checking for clojure collection types
+    (and
+     (or (instance? clojure.lang.IRecord o)
+         ;; (instance? clojure.lang.IType o)
+         )
+     (satisfies? JSONable o))
+
+    ;; the slow branch handles the general case. extends? is much faster than satisfies? so check that first
+    (or (extends? JSONable (class o))
+        (satisfies? JSONable o))))
+
 (defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex key-fn]
   (cond
    (nil? obj) (.writeNull ^JsonGenerator jg)
-   (satisfies? JSONable obj) (to-json obj jg)
+   (jsonable? obj true) (to-json obj jg)
 
    (i? IPersistentCollection obj)
    (condp instance? obj
@@ -144,6 +160,9 @@
                             sdf (doto (SimpleDateFormat. date-format)
                                   (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                         (write-string ^JsonGenerator jg (.format sdf obj)))
+
+   (jsonable? obj false) (to-json obj jg)
+
    :else (fail obj jg ex)))
 
 ;; Generic encoders, these can be used by someone writing a custom
